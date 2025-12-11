@@ -1,87 +1,100 @@
-const userModel = require(`../models/userModel`)
+const userModel = require('../models/userModel')
 
-const getAllBooks = async(req, res) =>{
-    try {
+const getAllBooks = async(req,res)=>{
+    try{
         const books = await userModel.getAllBooks()
         res.json(books)
     }
-    catch (error) {
+    catch (error){
         res.status(500).json(
             {
-                massage : "Error Get All Book",
-                status : 500 
+                message : "Error Get All Book",
+                status : 500
             }
         )
-    } 
+    }
 }
 
-const getBookByCode = async(req, res)=>{
+const getBookByCode = async(req,res)=>{
     try{
         const book = await userModel.getBookByCode(req.params.code);
 
         if(!book){
             return res.status(400).json(
             {
-                massege : `Data Not Found`
+                message : 'Data Not Found'
             })
         }
+    
+    res.status(200).json(book);
     }
-    catch(error){
-        res.status(500).json({massege:error})
-
+    catch (error){
+        res.status(500).json({message:error})
     }
 }
-const addBook = async (req, res) =>{
-    const {kode, judul, pengarang,penerbit} = req.body
-    let iskode=true
-    let isjudul=true
-    let msg=""
-
+const addBook = async(req,res)=>{
+    const {kode, judul, pengarang, penerbit} = req.body
+    let iskode = true
+    let isjudul = true
+    let msg = ""
     if(!kode){
-        msg = msg + "Kode Buku Wajib diisi\n"
-        iskode = false
+        msg = msg + "Kode wajib diisi\n"
+        iskode=false
     }
-    else if(!judul){
-        msg = msg + "Judul Buku Wajib diisi\n"
-        isjudul = false
+    if(!judul){
+        msg=msg+"judul wajib diisi\n"
+        isjudul=false
     }
     if(iskode && isjudul){
-        try {
+        try{
             const affected = await userModel.addBook(req.body)
-        }catch (error) {
+            if (affected==1){
+                res.status(201).json({ 
+                    message: "Success",
+                    data:{...req.body}
+                })
+            }
+            
+        }catch (error){
             res.status(400).json({
-                massage : error
+                message: error
             })
-        
         }
     }
-    try {
-        const affected = await userModel.addBook(req.Body)
-        if(affected==1){
-            res.status(200).json({
-                msg : "Insert Succesfully",
-                data:{...req.body}
-            })
-        }
-    } catch (error){
-        res.status(400).json({
-            massage : error
-        })
+    else{
+        res.status(400).json({msg:msg})
     }
 }
+
 const delBook = async(req,res)=>{
-    console.log(requery.params.code);
-    try{
+    try {
         const result = await userModel.delBook(req.params.code)
         if(result==1){
-            res.status(200).json({msg: "Deleted Successfully"})
+            res.status(200).json({msg: "Delete success"})
         }
         else{
-            res.status(400).json({msg:"Failed"})
+            res.status(400).json({msg: "Failed"})
         }
-    }
-    catch(error){
 
+    } catch (error) {
+        res.status(400).json({msg:error})
     }
 }
-module.exports = {getAllBooks, getBookByCode, addBook, delBook}
+
+const updateBook = async(req,res)=>{
+    const {kode, judul, pengarang, penerbit} = req.body
+    try {
+        const affected = await userModel.updateBook(req.params.code, req.body);
+        if (affected == 1){
+            res.status(200).json({msg: "Update Success"})
+        }
+        else{
+            res.status(400).json({msg: "Update Failed"})
+        }
+    } catch (error) {
+        res.status(400).json({msg: error})
+    }
+}
+
+
+module.exports = {getAllBooks, getBookByCode, addBook, delBook, updateBook}
