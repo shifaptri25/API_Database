@@ -10,8 +10,7 @@ const getAllBooks = async(req,res)=>{
             {
                 message : "Error Get All Book",
                 status : 500
-            }
-        )
+            })
     }
 }
 
@@ -33,11 +32,11 @@ const getBookByCode = async(req,res)=>{
     }
 }
 const addBook = async(req,res)=>{
-    const {kode, judul, pengarang, penerbit} = req.body
-    let iskode = true
+    const {kode_buku, judul, pengarang, penerbit} = req.body
+    let iskode_buku = true
     let isjudul = true
     let msg = ""
-    if(!kode){
+    if(!kode_buku){
         msg = msg + "Kode wajib diisi\n"
         iskode=false
     }
@@ -45,7 +44,7 @@ const addBook = async(req,res)=>{
         msg=msg+"judul wajib diisi\n"
         isjudul=false
     }
-    if(iskode && isjudul){
+    if(iskode_buku && isjudul){
         try{
             const affected = await userModel.addBook(req.body)
             if (affected==1){
@@ -73,7 +72,7 @@ const delBook = async(req,res)=>{
             res.status(200).json({msg: "Delete success"})
         }
         else{
-            res.status(400).json({msg: "Failed"})
+            res.status(400).json({msg: "Delete Failed"})
         }
 
     } catch (error) {
@@ -82,7 +81,7 @@ const delBook = async(req,res)=>{
 }
 
 const updateBook = async(req,res)=>{
-    const {kode, judul, pengarang, penerbit} = req.body
+    const {kode_buku, judul, pengarang, penerbit} = req.body
     try {
         const affected = await userModel.updateBook(req.params.code, req.body);
         if (affected == 1){
